@@ -15,7 +15,7 @@ LIBS = -lglfw3 -lGLEWs $(HOME)/Projects/common/shader.o
 
 all: flock
 
-flock: flock.o 
+flock: flock.o Bird.o
 	$(CC) -o $@ $^ $(LFLAGS) $(LPATH) $(LIBS)
 	
 .cpp.o: 
