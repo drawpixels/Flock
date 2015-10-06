@@ -12,6 +12,9 @@
 #define MAX_SPEED 0.15f
 #define MIN_SPEED 0.05
 #define MAX_CHANGE 0.1f
+#define COEFF_AVOID 0.0002f
+#define COEFF_MATCH 0.001f
+#define COEFF_CENTER 0.001f
 
 Bird::Bird () : 
 	m_Position (glm::vec2(0.0f,0.0f)), 
@@ -87,13 +90,14 @@ void Bird::Align (Bird* b, int num, int self) {
 			if ((dist<VIS_DIST) && (std::abs(angle)<VIS_ANGLE)) {
 				m_Color = glm::vec3(1.0f,0.0f,0.0f);
 				num_neighbour++;
+				float strength;
 				//-- Collision avoidance
 				if (dist<MIN_DIST) {
-					float strength = (dist<0.05) ? 0.8 : (0.0001f/dist/dist);
+					strength = (dist<0.05) ? (COEFF_AVOID/0.05/0.05) : (COEFF_AVOID/dist/dist);
 					vAvoidance = vAvoidance + glm::normalize(delta) * strength;
 				}
 				//-- Velocity Matching
-				
+				vMatching = vMatching + b[i].GetVelocity();
 				//-- Flock Centering
 				
 			}
@@ -102,6 +106,7 @@ void Bird::Align (Bird* b, int num, int self) {
 	/*---- DEBUG PRINT ----*
 	if (self==0) printf("%6.4f,%6.4f\n",VIS_DIST,VIS_ANGLE);
 	*---- DEBUG PRINT ----*/
+	vMatching = vMatching / float(num_neighbour) - GetVelocity();
 	glm::vec2 vChange = vAvoidance + vMatching + vCentering;
 	float len_change = glm::length(vChange);
 	if (len_change>0.0f) {
