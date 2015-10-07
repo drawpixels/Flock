@@ -9,11 +9,11 @@
 #define VIS_DIST 0.4f
 #define VIS_ANGLE 2.5f
 #define MIN_DIST 0.2f
-#define MAX_SPEED 0.15f
-#define MIN_SPEED 0.05
+#define MAX_SPEED 0.2f
+#define MIN_SPEED 0.08
 #define MAX_CHANGE 0.1f
 #define COEFF_AVOID 0.0002f
-#define COEFF_MATCH 0.001f
+#define COEFF_MATCH 0.1f
 #define COEFF_CENTER 0.001f
 
 Bird::Bird () : 
@@ -99,14 +99,15 @@ void Bird::Align (Bird* b, int num, int self) {
 				//-- Velocity Matching
 				vMatching = vMatching + b[i].GetVelocity();
 				//-- Flock Centering
-				
+				//vCentering = vCentering + b[i].GetPosition();
 			}
 		}
 	}
 	/*---- DEBUG PRINT ----*
 	if (self==0) printf("%6.4f,%6.4f\n",VIS_DIST,VIS_ANGLE);
 	*---- DEBUG PRINT ----*/
-	vMatching = vMatching / float(num_neighbour) - GetVelocity();
+	vMatching = (vMatching / float(num_neighbour) - GetVelocity()) * COEFF_MATCH;
+	//vCentering = (vCentering / float(num_neighbour) - m_Position) * COEFF_CENTER;
 	glm::vec2 vChange = vAvoidance + vMatching + vCentering;
 	float len_change = glm::length(vChange);
 	if (len_change>0.0f) {

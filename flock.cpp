@@ -15,7 +15,7 @@
 #include <common/shader.hpp>
 #include "Bird.hpp"
 
-#define NUM_OF_BIRDS 10
+#define NUM_OF_BIRDS 20
 
 GLFWwindow* g_MainWindow;
 
@@ -23,7 +23,8 @@ char g_WindowTitle[] = "FLOCK";
 float g_WindowWidth = 800.0f;
 float g_WindowHeight = 800.0f;
 bool g_running = true;
-bool g_disp_range = true;
+bool g_disp_range = false;
+bool g_color = false;
 
 void CallbackWindowSize (GLFWwindow*, int, int);
 void CallbackKey (GLFWwindow*, int, int, int, int);
@@ -66,6 +67,7 @@ int main (int argc, char** argv)
 	// Load shaders
 	GLuint shader = LoadShaders("Instancing.vert", "Instancing.frag");
     glUseProgram (shader);
+	GLuint ColorID = glGetUniformLocation(shader, "gColor");
 
 	// Set call back functions
 	glfwMakeContextCurrent(g_MainWindow);
@@ -101,6 +103,10 @@ int main (int argc, char** argv)
 
 		DisplayBirds(birds,NUM_OF_BIRDS,vboPos,vboOri,vboColor);
 		glBindVertexArray(vaoObject);
+		if (g_color)
+			glUniform3f(ColorID,0.0f,0.0f,0.0f);
+		else
+			glUniform3f(ColorID,1.0f,1.0f,1.0f);
 		glDrawArraysInstanced(GL_TRIANGLES,0,9,NUM_OF_BIRDS);
 		if (g_disp_range)
 			glDrawArraysInstanced(GL_LINE_STRIP,9,11,NUM_OF_BIRDS);
@@ -134,6 +140,8 @@ void CallbackKey (GLFWwindow* window, int key, int scancode, int action, int mod
 		g_running = !g_running;
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
 		g_disp_range = !g_disp_range;
+    if (key == GLFW_KEY_C && action == GLFW_PRESS)
+		g_color = !g_color;
 }
 
 void CallbackCursonPos (GLFWwindow* window, double x, double y) {
